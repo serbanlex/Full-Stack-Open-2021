@@ -1,16 +1,22 @@
-import React, { useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import PersonList from './PersonList'
 import InputEntry from './InputEntry'
 
 const App = () => {
   // meant to update the persons in the phone book
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [ persons, setPersons ] = useState([])
+
+  useEffect(() => {
+    console.log('Fetching persons api data')
+
+    const eventHandler = response => {
+      console.log('Successfully fetched persons data.')
+      setPersons(response.data)
+    }
+
+    axios.get('http://localhost:3001/persons').then(eventHandler)
+  }, [])
 
 
   // copy of the persons which updates whenever we update on persons. Used in the search, always filtering on the complete list

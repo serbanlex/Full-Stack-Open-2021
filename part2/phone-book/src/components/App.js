@@ -4,14 +4,18 @@ import PersonList from './PersonList'
 import InputEntry from './InputEntry'
 
 const App = () => {
-  // meant to update the persons in the phone book
+  // person list which updates whenever we update (add/delete) on persons. This one will always be complete and unaltered.
   const [ persons, setPersons ] = useState([])
+
+  // meant to update the searched persons in the phone book, this one will modify on the searching preferences
+  const [ filteredPersons, setFilteredPersons ] = useState([])
 
   useEffect(() => {
     console.log('Fetching persons api data')
 
     const eventHandler = response => {
       console.log('Successfully fetched persons data.')
+      setFilteredPersons(response.data)
       setPersons(response.data)
     }
 
@@ -19,14 +23,11 @@ const App = () => {
   }, [])
 
 
-  // copy of the persons which updates whenever we update on persons. Used in the search, always filtering on the complete list
-  const [ personsCopy, copyPersons ] = useState(persons)
-
   // meant to control the form input elements
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
 
-  // handling the event of pressing button "add person"
+  // handling the event of pressing button "add person", by adding it to the person list
   const addPersonHandler = (event) => {
     event.preventDefault()
     
@@ -43,8 +44,8 @@ const App = () => {
       number: newNumber
     }
 
+    setFilteredPersons(persons.concat(personObject))
     setPersons(persons.concat(personObject))
-    copyPersons(persons.concat(personObject))
     setNewName('')
   }
 
@@ -63,9 +64,9 @@ const App = () => {
     
     let newSearchValue = event.target.value.toLowerCase()
 
-    const filteredPersons = personsCopy.filter(person => person.name.toLowerCase().startsWith(newSearchValue))
+    const filteredPersons = persons.filter(person => person.name.toLowerCase().startsWith(newSearchValue))
     
-    setPersons(filteredPersons)
+    setFilteredPersons(filteredPersons)
   }
 
 
@@ -88,7 +89,7 @@ const App = () => {
       <InputEntry name="Name to search by" onChangeHandler={typingSearchHandler}/>
 
       <h2>--- Persons added ---</h2>
-      <PersonList personList={persons}/>
+      <PersonList personList={filteredPersons}/>
     </div>
   )
 }
